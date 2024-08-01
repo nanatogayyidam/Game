@@ -3,121 +3,161 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fun Clicker Game</title>
+    <title>این گیم منه مادر*نده</title>
     <style>
         body {
             text-align: center;
             font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
+            background-color: #e0e0e0;
             margin-top: 50px;
         }
-        #game, #shop {
-            margin-top: 50px;
+        #game {
+            position: relative;
+            margin: 0 auto;
+            width: 600px;
+            height: 400px;
+            border: 2px solid #333;
+            background-color: #fff;
+            overflow: hidden;
         }
-        #button {
-            padding: 20px;
-            font-size: 20px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px;
+        .target, .powerUp {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
             cursor: pointer;
         }
-        #button:hover {
-            background-color: #45a049;
+        .target {
+            background-color: red;
+        }
+        .target.blue {
+            background-color: blue;
+        }
+        .target.green {
+            background-color: green;
         }
         .powerUp {
-            padding: 10px;
-            font-size: 16px;
-            background-color: #008CBA;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            margin: 10px;
+            background-color: gold;
         }
-        .powerUp:hover {
-            background-color: #007B9E;
+        #score, #timer, #level {
+            font-size: 24px;
+            margin-top: 10px;
         }
-        #score {
+        #gameOver {
+            display: none;
             font-size: 24px;
             margin-top: 20px;
         }
     </style>
 </head>
 <body>
-    <h1>Fun Clicker Game</h1>
+    <h1>این گیم منه مادر*نده</h1>
     <div id="game">
-        <button id="button" onclick="incrementScore()">Click Me!</button>
-        <p id="score">Score: 0</p>
-        <p id="status"></p>
+        <div id="target" class="target"></div>
+        <div id="powerUp" class="powerUp" style="display: none;"></div>
     </div>
-    <div id="shop">
-        <h2>Shop</h2>
-        <button class="powerUp" onclick="buyDoublePoints()">Buy Double Points (Cost: 50)</button>
-        <button class="powerUp" onclick="buyAutoClicker()">Buy Auto Clicker (Cost: 100)</button>
-    </div>
+    <p id="score">Score: 0</p>
+    <p id="timer">Time Left: 30s</p>
+    <p id="level">Level: 1</p>
+    <div id="gameOver"></div>
+    <button onclick="startGame()">Start Game</button>
+
     <script>
         let score = 0;
-        let multiplier = 1;
-        let autoClickerActive = false;
-        let doublePointsActive = false;
+        let timeLeft = 30;
+        let level = 1;
+        let gameInterval;
+        let target = document.getElementById('target');
+        let powerUp = document.getElementById('powerUp');
+        let scoreDisplay = document.getElementById('score');
+        let timerDisplay = document.getElementById('timer');
+        let levelDisplay = document.getElementById('level');
+        let gameOverDisplay = document.getElementById('gameOver');
+        let soundShoot = new Audio('shoot.mp3'); // Add your own sound files
+        let soundPowerUp = new Audio('powerup.mp3');
 
-        function incrementScore() {
-            score += multiplier;
+        function startGame() {
+            score = 0;
+            timeLeft = 30;
+            level = 1;
             updateScore();
+            updateTimer();
+            updateLevel();
+            target.style.display = 'block';
+            powerUp.style.display = 'none';
+            target.addEventListener('click', shootTarget);
+            gameInterval = setInterval(updateTime, 1000);
+            moveTarget();
+            spawnPowerUp();
+        }
+
+        function shootTarget() {
+            soundShoot.play();
+            score += getTargetScore();
+            updateScore();
+            moveTarget();
+            if (Math.random() < 0.2) spawnPowerUp(); // 20% chance to spawn a power-up
+        }
+
+        function getTargetScore() {
+            if (target.classList.contains('red')) return 1;
+            if (target.classList.contains('blue')) return 2;
+            if (target.classList.contains('green')) return 3;
+            return 1;
+        }
+
+        function moveTarget() {
+            let gameArea = document.getElementById('game');
+            let x = Math.random() * (gameArea.clientWidth - target.clientWidth);
+            let y = Math.random() * (gameArea.clientHeight - target.clientHeight);
+            target.style.left = x + 'px';
+            target.style.top = y + 'px';
+            let colors = ['red', 'blue', 'green'];
+            let randomColor = colors[Math.floor(Math.random() * colors.length)];
+            target.className = 'target ' + randomColor;
+        }
+
+        function spawnPowerUp() {
+let gameArea = document.getElementById('game');
+            let x = Math.random() * (gameArea.clientWidth - powerUp.clientWidth);
+            let y = Math.random() * (gameArea.clientHeight - powerUp.clientHeight);
+            powerUp.style.left = x + 'px';
+            powerUp.style.top = y + 'px';
+            powerUp.style.display = 'block';
+            powerUp.addEventListener('click', collectPowerUp);
+        }
+
+        function collectPowerUp() {
+            soundPowerUp.play();
+            score += 10;
+            timeLeft += 10;
+            updateScore();
+            updateTimer();
+            powerUp.style.display = 'none';
         }
 
         function updateScore() {
-            document.getElementById('score').innerText = "Score: " + score;
+            scoreDisplay.innerText = "Score: " + score;
         }
 
-        function buyDoublePoints() {
-            if (score >= 50) {
-                score -= 50;
-                doublePointsActive = true;
-                multiplier = 2;
-                updateScore();
-                updateStatus("Double Points Active for 10 seconds!");
-                setTimeout(deactivateDoublePoints, 10000); // Lasts for 10 seconds
-            } else {
-                alert("Not enough score to buy Double Points!");
+        function updateTime() {
+            timeLeft -= 1;
+            updateTimer();
+            if (timeLeft <= 0) {
+                clearInterval(gameInterval);
+                target.style.display = 'none';
+                powerUp.style.display = 'none';
+                gameOverDisplay.innerText = "Game Over! Your score is " + score + ".";
+                gameOverDisplay.style.display = 'block';
             }
         }
 
-        function deactivateDoublePoints() {
-            doublePointsActive = false;
-            multiplier = 1;
-            updateStatus("");
+        function updateTimer() {
+            timerDisplay.innerText = "Time Left: " + timeLeft + "s";
         }
 
-        function buyAutoClicker() {
-            if (score >= 100) {
-                score -= 100;
-                autoClickerActive = true;
-                updateScore();
-                updateStatus("Auto Clicker Active for 10 seconds!");
-                let autoClickerInterval = setInterval(() => {
-                    if (autoClickerActive) {
-                        score += 1;
-                        updateScore();
-                    } else {
-                        clearInterval(autoClickerInterval);
-                    }
-                }, 1000); // Increases score every second
-                setTimeout(deactivateAutoClicker, 10000); // Lasts for 10 seconds
-            } else {
-                alert("Not enough score to buy Auto Clicker!");
-            }
-        }
-
-        function deactivateAutoClicker() {
-            autoClickerActive = false;
-            updateStatus("");
-        }
-
-        function updateStatus(message) {
-            document.getElementById('status').innerText = message;
+        function updateLevel() {
+            levelDisplay.innerText = "Level: " + level;
         }
     </script>
 </body>
