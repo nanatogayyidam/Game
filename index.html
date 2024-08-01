@@ -1,9 +1,10 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>این گیم منه مادر*نده</title>
+    <title>گیم های من</title>
     <style>
         body {
             text-align: center;
@@ -11,7 +12,13 @@
             background-color: #e0e0e0;
             margin-top: 50px;
         }
-        #game {
+        .menu, .game, #game1, #game2 {
+            display: none;
+        }
+        .menu {
+            display: block;
+        }
+        .game {
             position: relative;
             margin: 0 auto;
             width: 600px;
@@ -51,113 +58,147 @@
     </style>
 </head>
 <body>
-    <h1>این گیم منه مادر*نده</h1>
-    <div id="game">
-        <div id="target" class="target"></div>
-        <div id="powerUp" class="powerUp" style="display: none;"></div>
+    <h1>گیم های من</h1>
+    
+    <div class="menu">
+        <button onclick="showGame('game1')">Play Game 1</button>
+        <button onclick="showGame('game2')">Play Game 2</button>
     </div>
-    <p id="score">Score: 0</p>
-    <p id="timer">Time Left: 30s</p>
-    <p id="level">Level: 1</p>
-    <div id="gameOver"></div>
-    <button onclick="startGame()">Start Game</button>
+    
+    <div id="game1" class="game">
+        <div id="target1" class="target"></div>
+        <div id="powerUp1" class="powerUp" style="display: none;"></div>
+        <p id="score1">Score: 0</p>
+        <p id="timer1">Time Left: 30s</p>
+        <p id="level1">Level: 1</p>
+        <div id="gameOver1" class="gameOver"></div>
+        <button onclick="startGame('game1')">Start Game</button>
+    </div>
+
+    <div id="game2" class="game">
+        <!-- Implement your second game here -->
+        <p>Game 2 Content</p>
+        <!-- Example Button to go back to Menu -->
+        <button onclick="showMenu()">Back to Menu</button>
+    </div>
 
     <script>
-        let score = 0;
-        let timeLeft = 30;
-        let level = 1;
-        let gameInterval;
-        let target = document.getElementById('target');
-        let powerUp = document.getElementById('powerUp');
-        let scoreDisplay = document.getElementById('score');
-        let timerDisplay = document.getElementById('timer');
-        let levelDisplay = document.getElementById('level');
-        let gameOverDisplay = document.getElementById('gameOver');
+        // Game 1 Variables
+        let score1 = 0;
+        let timeLeft1 = 30;
+        let level1 = 1;
+        let gameInterval1;
+        let target1 = document.getElementById('target1');
+        let powerUp1 = document.getElementById('powerUp1');
+        let scoreDisplay1 = document.getElementById('score1');
+        let timerDisplay1 = document.getElementById('timer1');
+        let levelDisplay1 = document.getElementById('level1');
+        let gameOverDisplay1 = document.getElementById('gameOver1');
         let soundShoot = new Audio('shoot.mp3'); // Add your own sound files
         let soundPowerUp = new Audio('powerup.mp3');
 
-        function startGame() {
-            score = 0;
-            timeLeft = 30;
-            level = 1;
-            updateScore();
-            updateTimer();
-            updateLevel();
-            target.style.display = 'block';
-            powerUp.style.display = 'none';
-            target.addEventListener('click', shootTarget);
-            gameInterval = setInterval(updateTime, 1000);
-            moveTarget();
-            spawnPowerUp();
+        function startGame(gameId) {
+            if (gameId === 'game1') {
+                score1 = 0;
+                timeLeft1 = 30;
+                level1 = 1;
+                updateScore(gameId);
+                updateTimer(gameId);
+                updateLevel(gameId);
+                target1.style.display = 'block';
+                powerUp1.style.display = 'none';
+                target1.addEventListener('click', shootTarget);
+                gameInterval1 = setInterval(() => updateTime(gameId), 1000);
+                moveTarget();
+                spawnPowerUp();
+            }
         }
 
         function shootTarget() {
             soundShoot.play();
-            score += getTargetScore();
-            updateScore();
+            score1 += getTargetScore();
+            updateScore('game1');
             moveTarget();
             if (Math.random() < 0.2) spawnPowerUp(); // 20% chance to spawn a power-up
         }
 
         function getTargetScore() {
-            if (target.classList.contains('red')) return 1;
-            if (target.classList.contains('blue')) return 2;
-            if (target.classList.contains('green')) return 3;
+            if (target1.classList.contains('red')) return 1;
+            if (target1.classList.contains('blue')) return 2;
+            if (target1.classList.contains('green')) return 3;
             return 1;
         }
 
         function moveTarget() {
-            let gameArea = document.getElementById('game');
-            let x = Math.random() * (gameArea.clientWidth - target.clientWidth);
-            let y = Math.random() * (gameArea.clientHeight - target.clientHeight);
-            target.style.left = x + 'px';
-            target.style.top = y + 'px';
+            let gameArea = document.getElementById('game1');
+            let x = Math.random() * (gameArea.clientWidth - target1.clientWidth);
+            let y = Math.random() * (gameArea.clientHeight - target1.clientHeight);
+            target1.style.left = x + 'px';
+            target1.style.top = y + 'px';
             let colors = ['red', 'blue', 'green'];
             let randomColor = colors[Math.floor(Math.random() * colors.length)];
-            target.className = 'target ' + randomColor;
+            target1.className = 'target ' + randomColor;
         }
 
         function spawnPowerUp() {
-let gameArea = document.getElementById('game');
-            let x = Math.random() * (gameArea.clientWidth - powerUp.clientWidth);
-            let y = Math.random() * (gameArea.clientHeight - powerUp.clientHeight);
-            powerUp.style.left = x + 'px';
-            powerUp.style.top = y + 'px';
-            powerUp.style.display = 'block';
-            powerUp.addEventListener('click', collectPowerUp);
+            let gameArea = document.getElementById('game1');
+            let x = Math.random() * (gameArea.clientWidth - powerUp1.clientWidth);
+            let y = Math.random() * (gameArea.clientHeight - powerUp1.clientHeight);
+            powerUp1.style.left = x + 'px';
+            powerUp1.style.top = y + 'px';
+            powerUp1.style.display = 'block';
+            powerUp1.addEventListener('click', collectPowerUp);
         }
 
         function collectPowerUp() {
             soundPowerUp.play();
-            score += 10;
-            timeLeft += 10;
-            updateScore();
-            updateTimer();
-            powerUp.style.display = 'none';
+            score1 += 10;
+            timeLeft1 += 10;
+            updateScore('game1');
+            updateTimer('game1');
+            powerUp1.style.display = 'none';
         }
 
-        function updateScore() {
-            scoreDisplay.innerText = "Score: " + score;
-        }
-
-        function updateTime() {
-            timeLeft -= 1;
-            updateTimer();
-            if (timeLeft <= 0) {
-                clearInterval(gameInterval);
-                target.style.display = 'none';
-                powerUp.style.display = 'none';
-                gameOverDisplay.innerText = "Game Over! Your score is " + score + ".";
-                gameOverDisplay.style.display = 'block';
+        function updateScore(gameId) {
+            if (gameId === 'game1') {
+                scoreDisplay1.innerText = "Score: " + score1;
             }
         }
 
-        function updateTimer() {
-            timerDisplay.innerText = "Time Left: " + timeLeft + "s";
+        function updateTime(gameId) {
+            if (gameId === 'game1') {
+                timeLeft1 -= 1;
+                updateTimer('game1');
+                if (timeLeft1 <= 0) {
+                    clearInterval(gameInterval1);
+                    target1.style.display = 'none';
+                    powerUp1.style.display = 'none';
+                    gameOverDisplay1.innerText = "Game Over! Your score is " + score1 + ".";
+                    gameOverDisplay1.style.display = 'block';
+                }
+            }
         }
 
-        function updateLevel() {
-            levelDisplay.innerText = "Level: " + level;
+        function updateTimer(gameId) {
+            if (gameId === 'game1') {
+                timerDisplay1.innerText = "Time Left: " + timeLeft1 + "s";
+            }
+        }
+
+        function updateLevel(gameId) {
+            if (gameId === 'game1') {
+                levelDisplay1.innerText = "Level: " + level1;
+            }
+        }
+
+        function showGame(gameId) {
+            document.querySelector('.menu').style.display = 'none';
+            document.getElementById(gameId).style.display = 'block';
+        }
+
+        function showMenu() {
+            document.querySelector('.menu').style.display = 'block';
+            document.querySelectorAll('.game').forEach(game => game.style.display = 'none');
         }
     </script>
 </body>
