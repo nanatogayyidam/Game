@@ -3,18 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Click Game</title>
+    <title>Fun Clicker Game</title>
     <style>
         body {
             text-align: center;
             font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin-top: 50px;
         }
-        #game {
+        #game, #shop {
             margin-top: 50px;
         }
         #button {
             padding: 20px;
             font-size: 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #button:hover {
+            background-color: #45a049;
+        }
+        .powerUp {
+            padding: 10px;
+            font-size: 16px;
+            background-color: #008CBA;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        .powerUp:hover {
+            background-color: #007B9E;
         }
         #score {
             font-size: 24px;
@@ -23,37 +46,78 @@
     </style>
 </head>
 <body>
-    <h1>Click the Button Game</h1>
+    <h1>Fun Clicker Game</h1>
     <div id="game">
         <button id="button" onclick="incrementScore()">Click Me!</button>
         <p id="score">Score: 0</p>
-        <p id="time">Time left: 10s</p>
+        <p id="status"></p>
+    </div>
+    <div id="shop">
+        <h2>Shop</h2>
+        <button class="powerUp" onclick="buyDoublePoints()">Buy Double Points (Cost: 50)</button>
+        <button class="powerUp" onclick="buyAutoClicker()">Buy Auto Clicker (Cost: 100)</button>
     </div>
     <script>
         let score = 0;
-        let timeLeft = 10;
-        let timer;
+        let multiplier = 1;
+        let autoClickerActive = false;
+        let doublePointsActive = false;
 
         function incrementScore() {
-            if (timeLeft > 0) {
-                score++;
-                document.getElementById('score').innerText = "Score: " + score;
-            }
+            score += multiplier;
+            updateScore();
         }
 
-        function countdown() {
-            if (timeLeft > 0) {
-                timeLeft--;
-                document.getElementById('time').innerText = "Time left: " + timeLeft + "s";
+        function updateScore() {
+            document.getElementById('score').innerText = "Score: " + score;
+        }
+
+        function buyDoublePoints() {
+            if (score >= 50) {
+                score -= 50;
+                doublePointsActive = true;
+                multiplier = 2;
+                updateScore();
+                updateStatus("Double Points Active for 10 seconds!");
+                setTimeout(deactivateDoublePoints, 10000); // Lasts for 10 seconds
             } else {
-                clearInterval(timer);
-                document.getElementById('button').disabled = true;
-                alert("Time's up! Your final score is: " + score);
+                alert("Not enough score to buy Double Points!");
             }
         }
 
-        window.onload = function() {
-            timer = setInterval(countdown, 1000);
+        function deactivateDoublePoints() {
+            doublePointsActive = false;
+            multiplier = 1;
+            updateStatus("");
+        }
+
+        function buyAutoClicker() {
+            if (score >= 100) {
+                score -= 100;
+                autoClickerActive = true;
+                updateScore();
+                updateStatus("Auto Clicker Active for 10 seconds!");
+                let autoClickerInterval = setInterval(() => {
+                    if (autoClickerActive) {
+                        score += 1;
+                        updateScore();
+                    } else {
+                        clearInterval(autoClickerInterval);
+                    }
+                }, 1000); // Increases score every second
+                setTimeout(deactivateAutoClicker, 10000); // Lasts for 10 seconds
+            } else {
+                alert("Not enough score to buy Auto Clicker!");
+            }
+        }
+
+        function deactivateAutoClicker() {
+            autoClickerActive = false;
+            updateStatus("");
+        }
+
+        function updateStatus(message) {
+            document.getElementById('status').innerText = message;
         }
     </script>
 </body>
