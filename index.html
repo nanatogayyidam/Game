@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Click Game</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+        #game {
+            margin-top: 50px;
+        }
+        #button {
+            padding: 20px;
+            font-size: 20px;
+        }
+        #score {
+            font-size: 24px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Click the Button Game</h1>
+    <div id="game">
+        <button id="button" onclick="incrementScore()">Click Me!</button>
+        <p id="score">Score: 0</p>
+        <p id="time">Time left: 10s</p>
+    </div>
+    <script>
+        let score = 0;
+        let timeLeft = 10;
+        let timer;
+
+        function incrementScore() {
+            if (timeLeft > 0) {
+                score++;
+                document.getElementById('score').innerText = "Score: " + score;
+            }
+        }
+
+        function countdown() {
+            if (timeLeft > 0) {
+                timeLeft--;
+                document.getElementById('time').innerText = "Time left: " + timeLeft + "s";
+            } else {
+                clearInterval(timer);
+                document.getElementById('button').disabled = true;
+                alert("Time's up! Your final score is: " + score);
+            }
+        }
+
+        window.onload = function() {
+            timer = setInterval(countdown, 1000);
+        }
+    </script>
+</body>
+</html>
